@@ -14,7 +14,7 @@ import java.net.Socket;
 public class Main_Client{
 
     public static void main(String[] args) {
-        Client client = new Client("Leonardo","Giallo");
+        Client client = new Client("Leonardo","Verde");
         client.connetti("127.0.0.1", 1789);
         client.chiudi();
         

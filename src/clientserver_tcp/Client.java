@@ -4,10 +4,13 @@
  */
 package clientserver_tcp;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,9 +19,13 @@ import java.util.logging.Logger;
  * @author Monni Leonardo
  */
 public class Client {
-    private String nome;
-    private String colore;
-    private Socket socket; 
+    String nome;
+    String colore;
+    Socket socket; 
+    Scanner scanner;
+    BufferedReader input;
+    BufferedWriter output;
+    static final String RESET = "\u001B[0m";
     
     Client(String nomeDefault, String coloreDefault){
         this.nome = nomeDefault;
@@ -47,11 +54,38 @@ public class Client {
     }
     
     public void scrivi(){
-        
+        if(socket != null && !socket.isClosed()){
+            System.err.println("Scrivi: "+ RESET);
+            String messaggio = scanner.nextLine();
+            System.out.println(messaggio+RESET);
+            try{
+                output.write(messaggio);
+                output.newLine();
+                output.flush();
+                if(messaggio.equalsIgnoreCase("chiudi")){
+                    chiudi();
+                }
+            } catch (IOException ex){
+            System.err.println(ex.getMessage());
+            }
+        }  
     }
     
     public void leggi(){
-        
+        if(socket != null && !socket.isClosed()){
+            String messaggioRicevuto = null;
+            try{
+                messaggioRicevuto = input.readLine();
+                System.out.println(messaggioRicevuto+RESET);
+                if(messaggioRicevuto == null){
+                    chiudi();
+                } else if(messaggioRicevuto.equalsIgnoreCase("chiudi")){
+                    chiudi();
+                }
+            } catch (IOException ex){
+            System.err.println(ex.getMessage());
+            }
+        }  
     }
     
     public void chiudi(){

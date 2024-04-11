@@ -7,6 +7,8 @@ package clientserver_tcp;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -31,9 +33,17 @@ public class Server {
 
     public Server(int porta) {
         this.porta = porta;
+        this.scanner = new Scanner(System.in);
         try {
             this.serverSocket = new ServerSocket(this.porta);
-            System.out.println("Server in esecuzione e in attesa di una richiesta");
+            System.out.println("Server in esecuzione e in attesa di una richiesta sulla porta: " + this.porta);
+            this.clientSocket=attendi();
+            if(clientSocket != null){
+                System.out.println("Connessione effettuatta correttamente");
+                output = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            }
+            comunica();
         } 
         
         catch(BindException ex){
@@ -48,25 +58,31 @@ public class Server {
 
     public Socket attendi(){
         try{
-            if(serverSocket != null){
-                this.clientSocket = serverSocket.accept();
-                System.out.println("Connessione effettuatta correttamente");
-            }
+            return serverSocket.accept();
+            
         }
         catch (NullPointerException ex){
             System.err.println(ex.getMessage());
+            return null;
         }
         
         catch (SocketException ex){
             System.err.println(ex.getMessage());
+            return null;
         }
         
         catch (IOException ex){
             System.err.println(ex.getMessage());
-        }
-        
-        return clientSocket;      
+            return null;
+        }   
     } 
+    
+    public void comunica(){
+        while(!serverSocket.isClosed() && !clientSocket.isClosed()){
+            leggi();
+            scrivi();
+        }
+    }
     
     
 

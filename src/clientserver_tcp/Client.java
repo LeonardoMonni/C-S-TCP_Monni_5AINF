@@ -7,6 +7,8 @@ package clientserver_tcp;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -30,13 +32,18 @@ public class Client {
     Client(String nomeDefault, String coloreDefault){
         this.nome = nomeDefault;
         this.colore = coloreDefault;
+        this.scanner = new Scanner(System.in);
     }
     
     public void connetti(String nomeServer, int portaServer){
+        System.out.println("Client " + nome + " in esecuzione!" +RESET);
         try {
-            System.out.println("Client " + nome + " in esecuzione!");
             this.socket = new Socket(nomeServer, portaServer);
-            System.out.println("Connessione avvenuta con successo con il server: " + nomeServer);
+            output = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            System.out.println("Connessione avvenuta con successo con il server: " + RESET);
+            
+            comunica();
         } 
         catch (ConnectException ex) { // il server non è in ascolto
             System.err.println(ex.getMessage());
@@ -48,10 +55,16 @@ public class Client {
         catch (IOException ex) {
             System.err.println(ex.getMessage());
         }
-        
-        
-        
+          
     }
+    
+    public void comunica(){
+        while (socket != null && !socket.isClosed()){
+            scrivi();
+            leggi();
+        }
+    }
+    
     
     public void scrivi(){
         if(socket != null && !socket.isClosed()){

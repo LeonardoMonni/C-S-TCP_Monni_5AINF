@@ -17,11 +17,6 @@ public class Main_Server{
     
     public static void main(String[] args) {
         Server server = new Server(1789);
-        server.attendi();
-        server.chiudi();
-        server.termina();
-        
-        
         
         }
     }
